@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryApiController;
+use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,6 +15,17 @@ use App\Http\Controllers\CategoryApiController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Route::post('/login', function() {
+    $user = User::where("email", request()->email)->first();
+    if($user) {
+        if(password_verify(request()->password, $user->password)) {
+            return $user->createToken("client")->plainTextToken;
+        }
+    }
+
+    return response(["msg" => "Incorrect Login"], 403);
+});
 
 Route::apiResource('/categories', CategoryApiController::class);
 
